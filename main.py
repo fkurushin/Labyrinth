@@ -2,6 +2,7 @@ import random
 import pygame
 import time
 from definitions import *
+from models import Player
 
 
 def start_point_generate(n, m):
@@ -81,38 +82,6 @@ def transition_choice(x, y, rm):
         return nx, ny, tx, ty
     else:
         return -1, -1, -1, -1
-
-
-def click_right(m):
-    """Движение вправо"""
-    global player
-    if len(m) > player[0] * 2 + 2:
-        if m[player[0] * 2 + 1][player[1] * 2]:
-            player[0] += 1
-
-
-def click_left(m):
-    """Движение влево"""
-    global player
-    if -1 < player[0] * 2 - 2:
-        if m[player[0] * 2 - 1][player[1] * 2]:
-            player[0] -= 1
-
-
-def click_down(m):
-    """Движение вниз"""
-    global player
-    if len(m[0]) > player[1] * 2 + 2:
-        if m[player[0] * 2][player[1] * 2 + 1]:
-            player[1] += 1
-
-
-def click_up(m):
-    """Движение вверх"""
-    global player
-    if -1 < player[1] * 2 - 2:
-        if m[player[0] * 2][player[1] * 2 - 1]:
-            player[1] -= 1
 
 
 def create_labyrinth(n=5, m=5):
@@ -216,52 +185,52 @@ def draw_labyrinth(
     )
 
 
-def delete_player():
-    """Функция удаления игрока при движении и оставления следов"""
-    if (player[0], player[1]) == start:
-        pygame.draw.circle(
-            window,
-            color_start,
-            (
-                border + player[0] * (width_line + width_walls) + width_line // 2,
-                border + player[1] * (width_line + width_walls) + width_line // 2,
-            ),
-            width_line // 2 - 3,
-        )
-    else:
-        pygame.draw.circle(
-            window,
-            color_way,
-            (
-                border + player[0] * (width_line + width_walls) + width_line // 2,
-                border + player[1] * (width_line + width_walls) + width_line // 2,
-            ),
-            width_line // 2 - 3,
-        )
-    if trace:
-        pygame.draw.circle(
-            window,
-            color_trace,
-            (
-                border + player[0] * (width_line + width_walls) + width_line // 2,
-                border + player[1] * (width_line + width_walls) + width_line // 2,
-            ),
-            width_line // 3 - 3,
-        )
+# def delete_player():
+#     """Функция удаления игрока при движении и оставления следов"""
+#     if (player[0], player[1]) == start:
+#         pygame.draw.circle(
+#             window,
+#             color_start,
+#             (
+#                 border + player[0] * (width_line + width_walls) + width_line // 2,
+#                 border + player[1] * (width_line + width_walls) + width_line // 2,
+#             ),
+#             width_line // 2 - 3,
+#         )
+#     else:
+#         pygame.draw.circle(
+#             window,
+#             color_way,
+#             (
+#                 border + player[0] * (width_line + width_walls) + width_line // 2,
+#                 border + player[1] * (width_line + width_walls) + width_line // 2,
+#             ),
+#             width_line // 2 - 3,
+#         )
+#     if trace:
+#         pygame.draw.circle(
+#             window,
+#             color_trace,
+#             (
+#                 border + player[0] * (width_line + width_walls) + width_line // 2,
+#                 border + player[1] * (width_line + width_walls) + width_line // 2,
+#             ),
+#             width_line // 3 - 3,
+#         )
 
 
-def draw_player():
-    """Отрисовка игрока на экране"""
-    pygame.draw.circle(
-        window,
-        color_player,
-        (
-            border + player[0] * (width_line + width_walls) + width_line // 2,
-            border + player[1] * (width_line + width_walls) + width_line // 2,
-        ),
-        width_line // 2 - 3,
-    )
-
+# def draw_player():
+#     """Отрисовка игрока на экране"""
+#     pygame.draw.circle(
+#         window,
+#         color_player,
+#         (
+#             border + player[0] * (width_line + width_walls) + width_line // 2,
+#             border + player[1] * (width_line + width_walls) + width_line // 2,
+#         ),
+#         width_line // 2 - 3,
+#     )
+#
 
 def tick():
     """Cекудномер"""
@@ -279,8 +248,8 @@ def setting_trace():
         trace = True
 
 
-def new_game():
-    global record_time, start_time, player, matrix, start, finish, matrix_base
+def new_game(player):
+    global record_time, start_time, matrix, start, finish, matrix_base
     window.fill((0, 0, 0))
     start_time = time.time()
     pygame.draw.rect(window, (0, 0, 0), (0, height_window - 70, width_window, 70))
@@ -293,7 +262,7 @@ def new_game():
             print("Не найдено лабиринтов без повторения")
             break
     matrix_base.append(matrix)
-    player = list(start)
+
     draw_labyrinth(
         matrix,
         start,
@@ -306,7 +275,7 @@ def new_game():
         color_start,
         color_finish,
     )
-    draw_player()
+    player.draw_player(window)
 
 
 if __name__ == "__main__":
@@ -322,6 +291,7 @@ if __name__ == "__main__":
     pygame.display.set_caption("Лабиринт")
     font = pygame.font.Font(None, 25)
     flag_game = True
+    # start is a tuple with x and y
     matrix, start, finish = create_labyrinth(width, height)
     k = 0
     while matrix in matrix_base or start[0] == finish[0] or start[1] == finish[1]:
@@ -330,8 +300,10 @@ if __name__ == "__main__":
             print("Не найдено лабиринтов без повторения")
             break
         matrix, start, finish = create_labyrinth(width, height)
+
+    player = Player("Fedor", 0, *start)
+
     matrix_base.append(matrix)
-    player = list(start)
     start_time = time.time()
     draw_labyrinth(
         matrix,
@@ -345,13 +317,13 @@ if __name__ == "__main__":
         color_start,
         color_finish,
     )
-    draw_player()
+    player.draw_player(window)
 
     while flag_game:  # основной игровой цикл
-        delete_player()
-        if tuple(player) == finish:
+        player.delete_player(start, window)
+        if (player.x, player.y) == finish:
             window.fill((0, 0, 0))
-            score += 1
+            player.level += 1
             if t < record_time:
                 record_time = t
             start_time = time.time()
@@ -369,7 +341,8 @@ if __name__ == "__main__":
                     print("Не найдено лабиринтов без повторения")
                     break
             matrix_base.append(matrix)
-            player = list(start)
+            player.move_to_point(*start)
+
             draw_labyrinth(
                 matrix,
                 start,
@@ -382,31 +355,31 @@ if __name__ == "__main__":
                 color_start,
                 color_finish,
             )
-            draw_player()
+            player.draw_player(window)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 flag_game = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    click_right(matrix)
+                    player.click_right(matrix)
                 if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    click_left(matrix)
+                    player.click_left(matrix)
                 if event.key == pygame.K_UP or event.key == pygame.K_w:
-                    click_up(matrix)
+                    player.click_up(matrix)
                 if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    click_down(matrix)
+                    player.click_down(matrix)
                 if event.key == pygame.K_p:
                     pass
                 if event.key == pygame.K_q:
                     setting_trace()
                 if event.key == pygame.K_r:
-                    new_game()
+                    new_game(player)
                 if event.key == pygame.K_e:
-                    player[0] = start[0]
-                    player[1] = start[1]
+                    player.move_to_point(*start)
+
         if info and width >= 10:
             text1 = font.render(
-                "Пройдено лабиринтов: " + str(score), True, (255, 255, 255)
+                "Пройдено лабиринтов: " + str(player.level), True, (255, 255, 255)
             )
             window.blit(text1, [5, height_window - 65])
             pygame.draw.rect(
@@ -422,6 +395,6 @@ if __name__ == "__main__":
                     "Рекордное время: " + str(int(record_time)), True, (255, 255, 255)
                 )
                 window.blit(text3, [5, height_window - 20])
-        draw_player()
+        player.draw_player(window)
         tick()
         pygame.display.update()
