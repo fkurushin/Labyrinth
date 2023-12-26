@@ -11,16 +11,13 @@ color_trace = color_player
 width = 10
 height = 10
 width_window = (
-        ((width * 2 - 1) // 2 + 1) * width_line
-        + ((width * 2 - 1) // 2) * width_walls
-        + border * 2
+    ((width * 2 - 1) // 2 + 1) * width_line
+    + ((width * 2 - 1) // 2) * width_walls
+    + border * 2
 )
 height_window = (
-        ((height * 2 - 1) // 2 + 1) * width_line
-        + ((height * 2 - 1) // 2) * width_walls
-        + border * 2
+    ((height * 2 - 1) // 2 + 1) * width_line
+    + ((height * 2 - 1) // 2) * width_walls
+    + border * 2
 )
 info = True
-score = 0
-t = 0
-record_time = 9999
